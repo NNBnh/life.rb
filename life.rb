@@ -15,7 +15,7 @@ class GameOfLife
     @universe
   end
 
-  def iter # TODO improve
+  def iter
     @universe.each_with_index.map do |line, y|
       line.each_with_index.map do |_col, x|
         [*(y == 0 ? 0 : y - 1)..(y == @universe.size - 1 ? y : y + 1)].map do |ny|
@@ -38,10 +38,8 @@ class GameOfLife
     when :block then " ▄▀█"
     end => chars
 
-    @universe.inject([]) do |grouped, line| # FIXME odd number of lines bug
-      grouped.last == :pending ? grouped[0..-3] + [[grouped[-2], line]] : grouped + [line, :pending]
-    end
-    .map(&:transpose)
+    @universe.then { _1.size.odd? ? _1 + [[false] * _1[0].size] : _1 }
+    .each_slice(2).to_a.map(&:transpose)
     .map do |dua_lines|
       dua_lines.map do |dua_spaces|
         chars[dua_spaces.map { _1 ? "1" : "0" }.join.to_i(2)]
